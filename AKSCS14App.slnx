@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/AKSCS14App.Api/AKSCS14App.Api.csproj" />
+    <Project Path="src/AKSCS14App.AppHost/AKSCS14App.AppHost.csproj" />
+    <Project Path="src/AKSCS14App.ServiceDefaults/AKSCS14App.ServiceDefaults.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/AKSCS14App.Api.Tests/AKSCS14App.Api.Tests.csproj" />
+  </Folder>
+</Solution>

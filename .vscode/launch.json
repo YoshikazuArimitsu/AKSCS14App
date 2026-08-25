@@ -1,0 +1,29 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "C#: AKSCS14App.AppHost を起動(Aspireダッシュボード)",
+      "type": "dotnet",
+      "request": "launch",
+      "projectPath": "${workspaceFolder}/src/AKSCS14App.AppHost/AKSCS14App.AppHost.csproj"
+    },
+    {
+      "name": "C#: AKSCS14App.Api を起動(Swaggerを自動で開く)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      "program": "${workspaceFolder}/src/AKSCS14App.Api/bin/Debug/net10.0/AKSCS14App.Api.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/src/AKSCS14App.Api",
+      "stopAtEntry": false,
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)",
+        "uriFormat": "%s/swagger"
+      }
+    }
+  ]
+}

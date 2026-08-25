@@ -1,0 +1,63 @@
+{
+  "name": "AKSCS14App (Arimitsu ga Kangaeta Saikyo no C#14App)",
+  "image": "mcr.microsoft.com/dotnet/sdk:10.0",
+
+  "containerEnv": {
+    "ASPNETCORE_ENVIRONMENT": "Development",
+    "ASPNETCORE_URLS": "http://localhost:5080",
+
+    // ローカル内接続はProxyを通さない
+    "NO_PROXY": "localhost,127.0.0.1,::1,172.16.0.0/12,192.168.0.0/16",
+    "no_proxy": "localhost,127.0.0.1,::1,172.16.0.0/12,192.168.0.0/16"    
+  },
+
+  "forwardPorts": [5080, 7080, 15281, 19281, 15280, 17280, 21280, 22280],
+  "portsAttributes": {
+    "5080": {
+      "label": "AKSCS14App.Api (HTTP/Swagger)",
+      "onAutoForward": "silent"
+    },
+    "7080": {
+      "label": "AKSCS14App.Api (HTTPS/Swagger)",
+      "onAutoForward": "silent"
+    },
+    "15281": {
+      "label": "Aspire Dashboard (HTTP, devcontainer既定)",
+      "onAutoForward": "openBrowser"
+    },
+    "19281": {
+      "label": "Aspire OTLP Endpoint (HTTP, devcontainer既定)",
+      "onAutoForward": "silent"
+    },
+    "15280": {
+      "label": "Aspire Dashboard (HTTPS profile / HTTP側)",
+      "onAutoForward": "silent"
+    },
+    "17280": {
+      "label": "Aspire Dashboard (HTTPS profile / HTTPS側、要証明書信頼)",
+      "onAutoForward": "silent"
+    },
+    "21280": {
+      "label": "Aspire OTLP Endpoint (HTTPS profile、要証明書信頼)",
+      "onAutoForward": "silent"
+    },
+    "22280": {
+      "label": "Aspire Resource Service Endpoint (HTTPS profile、要証明書信頼)",
+      "onAutoForward": "silent"
+    }
+  },
+
+  "postCreateCommand": "dotnet restore AKSCS14App.slnx && dotnet dev-certs https && dotnet tool restore && dotnet husky install",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-dotnettools.csdevkit",
+        "ms-dotnettools.csharp"
+      ],
+      "settings": {
+        "dotnet.defaultSolution": "AKSCS14App.slnx"
+      }
+    }
+  }
+}

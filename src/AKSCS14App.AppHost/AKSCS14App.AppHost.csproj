@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Sdk Name="Aspire.AppHost.Sdk" Version="13.4.6" />
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>ef93d03f-4a8b-4c2e-9d1f-6b7e8f9a0c1d</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.AppHost" Version="13.5.0" />
+    <PackageReference Include="Aspire.Hosting.Redis" Version="13.5.0" />
+    <PackageReference Include="CommunityToolkit.Aspire.Hosting.Sqlite" Version="13.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AKSCS14App.Api\AKSCS14App.Api.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,24 @@
+## .NET
+bin/
+obj/
+out/
+*.user
+*.suo
+
+## Logs
+logs/
+*.log
+
+## IDE
+.vs/
+.idea/
+*.swp
+
+## Test results
+TestResults/
+coverage*.json
+coverage*.xml
+coverage*.info
+
+## Demo Sqlite
+src/AKSCS14App.AppHost/data/
