@@ -1,6 +1,9 @@
+using Amazon.SQS;
+
 using CS14App.Api.Compliance;
-using CS14App.Api.Data;
 using CS14App.Api.Services;
+
+using LocalStack.Client.Extensions;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Compliance.Classification;
@@ -24,11 +27,6 @@ try
     var builder = WebApplication.CreateBuilder(args);
 
     builder.AddServiceDefaults();
-
-    builder.Services.AddDbContext<AppDbContext>(options =>
-        options.UseSqlite(builder.Configuration.GetConnectionString("sqlitedb")));
-
-    builder.AddRedisClient("redis");
 
     // .NETコンプライアンス有効化（電話番号用 Redactor の登録）
     builder.Services.AddRedaction(options =>
@@ -66,6 +64,12 @@ try
     });
 
     builder.Services.AddSingleton<IGreetingService, GreetingService>();
+
+    // LocalStack.Aspire.Hosting が AppHost 側から転送する "LocalStack" 設定を読み込み、
+    // useServiceUrl: true で SQS クライアントのエンドポイントを LocalStack コンテナへ向ける。
+    // (素の AddAWSService<T>() では実 AWS のエンドポイントが使われてしまう)
+    builder.Services.AddLocalStack(builder.Configuration);
+    builder.Services.AddAwsService<IAmazonSQS>(useServiceUrl: true);
 
     var app = builder.Build();
 

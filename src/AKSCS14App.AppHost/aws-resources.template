@@ -1,0 +1,16 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Resources": {
+        "MessageQueue": {
+            "Type": "AWS::SQS::Queue",
+            "Properties": {
+                "VisibilityTimeout": 60
+            }
+        }
+    },
+    "Outputs": {
+        "MessageQueueUrl": {
+            "Value": { "Ref": "MessageQueue" }
+        }
+    }
+}

@@ -2,6 +2,7 @@
   <Folder Name="/src/">
     <Project Path="src/AKSCS14App.Api/AKSCS14App.Api.csproj" />
     <Project Path="src/AKSCS14App.AppHost/AKSCS14App.AppHost.csproj" />
+    <Project Path="src/AKSCS14App.SQSProcessor/AKSCS14App.SQSProcessor.csproj" />
     <Project Path="src/AKSCS14App.ServiceDefaults/AKSCS14App.ServiceDefaults.csproj" />
   </Folder>
   <Folder Name="/tests/">

@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Aspire_sqs-processor": {
+      "commandName": "Executable",
+      "executablePath": "dotnet",
+      "commandLineArgs": "exec --depsfile ./AKSCS14App.SQSProcessor.deps.json --runtimeconfig ./AKSCS14App.SQSProcessor.runtimeconfig.json %USERPROFILE%\\.dotnet\\tools\\.store\\amazon.lambda.testtool\\0.14.1\\amazon.lambda.testtool\\0.14.1\\content\\Amazon.Lambda.RuntimeSupport\\net10.0\\Amazon.Lambda.RuntimeSupport.TestTool.dll AKSCS14App.SQSProcessor::AKSCS14App.SQSProcessor.Function::FunctionHandler",
+      "workingDirectory": "bin\\Debug\\net10.0\\"
+    }
+  }
+}
