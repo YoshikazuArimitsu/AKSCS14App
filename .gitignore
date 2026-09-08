@@ -22,3 +22,6 @@ coverage*.info
 
 ## Demo Sqlite
 src/AKSCS14App.AppHost/data/
+
+## docker-compose (秘密情報を含む)
+.env
