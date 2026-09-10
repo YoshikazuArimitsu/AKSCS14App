@@ -5,6 +5,13 @@
 
 data "aws_availability_zones" "available" {
   state = "available"
+
+  # Local Zone（例: ap-northeast-tpe-1a）やWavelength Zoneは
+  # 通常のサブネット作成・ALB/RDSでは使えないため除外し、通常のAZのみに限定する。
+  filter {
+    name   = "zone-type"
+    values = ["availability-zone"]
+  }
 }
 
 resource "aws_vpc" "main" {
