@@ -15,7 +15,7 @@ output "rds_endpoint" {
 
 output "rds_master_user_secret_arn" {
   description = "RDSマスターユーザーの認証情報が格納されたSecrets ManagerシークレットのARN"
-  value       = aws_db_instance.postgres.master_user_secret[0].secret_arn
+  value       = aws_secretsmanager_secret.db_master.arn
 }
 
 output "sqs_queue_url" {
@@ -26,4 +26,14 @@ output "sqs_queue_url" {
 output "ecs_cluster_name" {
   description = "ECSクラスタ名"
   value       = aws_ecs_cluster.main.name
+}
+
+output "sqs_processor_ecr_repository_url" {
+  description = "SQSProcessor(Lambda)コンテナイメージをpushするECRリポジトリURL"
+  value       = aws_ecr_repository.sqs_processor.repository_url
+}
+
+output "sqs_processor_function_name" {
+  description = "SQSProcessor Lambda関数名"
+  value       = aws_lambda_function.sqs_processor.function_name
 }

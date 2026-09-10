@@ -1,3 +1,4 @@
+using Amazon.Extensions.NETCore.Setup;
 using Amazon.SQS;
 
 using CS14App.Api.Compliance;
@@ -65,11 +66,21 @@ try
 
     builder.Services.AddSingleton<IGreetingService, GreetingService>();
 
-    // LocalStack.Aspire.Hosting が AppHost 側から転送する "LocalStack" 設定を読み込み、
+    // ローカル(docker-compose+LocalStack)では LocalStack.Aspire.Hosting が転送する "LocalStack" 設定を読み込み、
     // useServiceUrl: true で SQS クライアントのエンドポイントを LocalStack コンテナへ向ける。
-    // (素の AddAWSService<T>() では実 AWS のエンドポイントが使われてしまう)
-    builder.Services.AddLocalStack(builder.Configuration);
-    builder.Services.AddAwsService<IAmazonSQS>(useServiceUrl: true);
+    // AWS実環境では LocalStack:UseLocalStack が未設定(false)になるため、
+    // LocalStack.Client.Extensions の AddAwsService は使わず（実クライアント生成時に
+    // "ClientFactory<T> missing constructor with AWSOptions parameter" で失敗するため）、
+    // AWSSDK.Extensions.NETCore.Setup 標準の AddAWSService でタスクロールの権限を使い実SQSへ接続する。
+    if (builder.Configuration.GetValue<bool>("LocalStack:UseLocalStack"))
+    {
+        builder.Services.AddLocalStack(builder.Configuration);
+        builder.Services.AddAwsService<IAmazonSQS>(useServiceUrl: true);
+    }
+    else
+    {
+        builder.Services.AddAWSService<IAmazonSQS>();
+    }
 
     var app = builder.Build();
 

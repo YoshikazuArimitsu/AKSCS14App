@@ -1,6 +1,29 @@
 # PostgreSQL (RDS)。docker-compose の postgres サービス（messagesdb）に相当する。
-# マスターパスワードは manage_master_user_password により
-# Secrets Manager 上に自動生成・管理させ、tfstate や変数に平文で残さない。
+# SQSProcessor(Lambda) は Secrets Manager を参照せず環境変数 ConnectionStrings__messagesdb を
+# 直接読む実装のため、マスターパスワードは random_password で生成し、
+# Secrets Manager にも保管しつつ Lambda の接続文字列組み立てに使う。
+
+resource "random_password" "db_master" {
+  length  = 24
+  special = false
+}
+
+resource "aws_secretsmanager_secret" "db_master" {
+  name                    = "${var.project_name}-db-master-password"
+  recovery_window_in_days = 0
+
+  tags = {
+    Name = "${var.project_name}-db-master-password"
+  }
+}
+
+resource "aws_secretsmanager_secret_version" "db_master" {
+  secret_id = aws_secretsmanager_secret.db_master.id
+  secret_string = jsonencode({
+    username = var.db_username
+    password = random_password.db_master.result
+  })
+}
 
 resource "aws_db_subnet_group" "main" {
   name       = "${var.project_name}-db-subnet-group"
@@ -23,8 +46,7 @@ resource "aws_db_instance" "postgres" {
 
   db_name  = var.db_name
   username = var.db_username
-
-  manage_master_user_password = true
+  password = random_password.db_master.result
 
   db_subnet_group_name   = aws_db_subnet_group.main.name
   vpc_security_group_ids = [aws_security_group.rds.id]
