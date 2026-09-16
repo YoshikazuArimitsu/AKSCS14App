@@ -2,6 +2,12 @@
   "name": "AKSCS14App (Arimitsu ga Kangaeta Saikyo no C#14App)",
   "image": "mcr.microsoft.com/dotnet/sdk:10.0",
 
+  // AppHost(Aspire)がPostgres/LocalStackをDockerコンテナとして起動するために必要
+  // (devcontainer-lock.jsonに解決済みバージョンあり)
+  "features": {
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
+  },
+
   "containerEnv": {
     "ASPNETCORE_ENVIRONMENT": "Development",
     "ASPNETCORE_URLS": "http://localhost:5080",
