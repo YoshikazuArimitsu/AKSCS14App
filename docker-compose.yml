@@ -1,0 +1,68 @@
+# AppHost(Aspire)がローカル実行時に立ち上げる依存リソースのうち、
+# Postgres・LocalStack(SQS)・Api の3つをdocker-composeで再現する。
+# SQSProcessor(Lambda)の実行はAppHost(dotnet run --project src/AKSCS14App.AppHost)側に委ねる。
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: messagesdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d messagesdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  localstack:
+    # AppHost(Aspire)側で動作実績のあるバージョンに固定
+    image: localstack/localstack:4.12.0
+    environment:
+      - DEBUG=0
+      # LocalStack Pro のライセンストークン。.env ファイル（gitignore対象）かシェルの環境変数で渡すこと。
+      # dotnet user-secrets set "LocalStack:AuthToken" "<token>" --project src/AKSCS14App.AppHost と同じ値。
+      - LOCALSTACK_AUTH_TOKEN=${LOCALSTACK_AUTH_TOKEN:?LOCALSTACK_AUTH_TOKEN を .env またはシェル環境変数で設定してください}
+    ports:
+      # ホスト側は 4567 番で公開（4566番は他のLocalStackインスタンスと衝突する可能性があるため）。
+      # コンテナ間通信（api→localstack）はコンテナ内部の4566番を使うため影響しない。
+      - "4567:4566"
+    volumes:
+      - localstack-data:/var/lib/localstack
+      - ./docker/localstack/init-queue.sh:/etc/localstack/init/ready.d/init-queue.sh:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  api:
+    build:
+      context: .
+      dockerfile: src/AKSCS14App.Api/Dockerfile
+    depends_on:
+      localstack:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      # LocalStackはリクエスト署名を検証しないが、AWS SDKはキー未設定だと例外を投げるためダミー値を渡す
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      AWS_REGION: ap-northeast-1
+      # LocalStack.Client の appsettings.json 相当の設定をコンテナ環境変数で上書き
+      LocalStack__UseLocalStack: "true"
+      LocalStack__Session__RegionName: ap-northeast-1
+      LocalStack__Config__LocalStackHost: localstack
+      LocalStack__Config__EdgePort: "4566"
+      LocalStack__Config__UseSsl: "false"
+      # MessagesController が参照するキューURL（init-queue.shで作成する固定名キュー）
+      AWS__Resources__MessageQueueUrl: http://localstack:4566/000000000000/MessageQueue
+    ports:
+      - "8080:8080"
+
+volumes:
+  postgres-data:
+  localstack-data:

@@ -1,0 +1,16 @@
+**/bin/
+**/obj/
+**/out/
+**/*.user
+**/*.suo
+**/logs/
+**/*.log
+.vs/
+.idea/
+.git/
+.github/
+.vscode/
+**/TestResults/
+tests/
+docker/
+*.md

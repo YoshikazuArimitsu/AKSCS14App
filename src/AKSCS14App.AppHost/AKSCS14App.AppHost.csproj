@@ -7,16 +7,33 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>ef93d03f-4a8b-4c2e-9d1f-6b7e8f9a0c1d</UserSecretsId>
+    <!-- SQSProcessor は AWS Lambda 関数プロジェクト（class library）のため実行可能ファイルではない -->
+    <NoWarn>$(NoWarn);ASPIRE004</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Aspire.Hosting.AppHost" Version="13.5.0" />
+    <!-- LocalStack.Aspire.Hosting 13.4.0 の nuspec 上の最低要求バージョンは 13.3.1 だが、
+         実際の原因はクライアント側 (AKSCS14App.Api) に LocalStack.Client の
+         AddLocalStack()/AddAwsService(useServiceUrl: true) が無かったことだったため、
+         AppHost 側は最新版のままで問題ない。13.7.2 は Lambda クラスライブラリの
+         ラッパープロジェクト一時パスの正規化修正を含むため、こちらを優先する。 -->
+    <PackageReference Include="Aspire.Hosting.AWS" Version="13.7.2" />
+    <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.5.3" />
     <PackageReference Include="Aspire.Hosting.Redis" Version="13.5.0" />
     <PackageReference Include="CommunityToolkit.Aspire.Hosting.Sqlite" Version="13.4.0" />
+    <PackageReference Include="LocalStack.Aspire.Hosting" Version="13.4.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\AKSCS14App.Api\AKSCS14App.Api.csproj" />
+    <ProjectReference Include="..\AKSCS14App.SQSProcessor\AKSCS14App.SQSProcessor.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="aws-resources.template">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
