@@ -46,6 +46,8 @@ services:
     depends_on:
       localstack:
         condition: service_healthy
+      postgres:
+        condition: service_healthy
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       # LocalStackはリクエスト署名を検証しないが、AWS SDKはキー未設定だと例外を投げるためダミー値を渡す
@@ -60,6 +62,9 @@ services:
       LocalStack__Config__UseSsl: "false"
       # MessagesController が参照するキューURL（init-queue.shで作成する固定名キュー）
       AWS__Resources__MessageQueueUrl: http://localstack:4566/000000000000/MessageQueue
+      # メッセージ一覧取得(GET /api/messages)が参照するPostgreSQL。
+      # SQSProcessor(Lambda)が書き込む audits テーブルと同じDBを読む。
+      ConnectionStrings__messagesdb: Host=postgres;Port=5432;Database=messagesdb;Username=postgres;Password=postgres
     ports:
       - "8080:8080"
 

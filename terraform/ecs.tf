@@ -39,6 +39,10 @@ resource "aws_ecs_task_definition" "api" {
         { name = "ASPNETCORE_ENVIRONMENT", value = "Development" },
         { name = "AWS_REGION", value = var.aws_region },
         { name = "AWS__Resources__MessageQueueUrl", value = aws_sqs_queue.messages.url },
+        # メッセージ一覧取得(GET /api/messages)用のRDS接続文字列。
+        # SQSProcessor(Lambda)と同じDBを参照する（lambda.tf の ConnectionStrings__messagesdb と同形式）。
+        # デモ環境のため Secrets Manager 参照ではなく環境変数で直接渡している。
+        { name = "ConnectionStrings__messagesdb", value = "Host=${aws_db_instance.postgres.address};Port=${aws_db_instance.postgres.port};Database=${var.db_name};Username=${var.db_username};Password=${random_password.db_master.result}" },
       ]
 
       logConfiguration = {
