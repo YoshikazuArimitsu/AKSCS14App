@@ -43,11 +43,13 @@ builder.AddAWSLambdaFunction<Projects.AKSCS14App_SQSProcessor>(
     .WithSQSEventSource(messageQueueUrl)
     .WaitFor(messagesDb);
 
-// API: SQS キューへメッセージを送信する
+// API: SQS キューへメッセージを送信し、蓄積済みメッセージの一覧を返す
 builder.AddProject<Projects.AKSCS14App_Api>("api")
     .WithReference(awsConfig)
     .WithReference(awsResources)
-    .WaitFor(awsResources);
+    .WithReference(messagesDb)
+    .WaitFor(awsResources)
+    .WaitFor(messagesDb);
 //.WithReplicas(3);    // スケールアウトする場合はコメントアウトを外す
 
 builder.UseLocalStack(localstack);

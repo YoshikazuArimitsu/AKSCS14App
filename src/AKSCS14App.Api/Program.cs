@@ -11,9 +11,12 @@ using Microsoft.Extensions.Compliance.Classification;
 using Microsoft.Extensions.Compliance.Redaction;
 using Microsoft.OpenApi;
 
+using Npgsql;
+
 using Serilog;
 using Serilog.Extensions.Hosting;
 
+const string MessagesDbConnectionName = "messagesdb";
 const string ConsoleOutputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext}: {Message:lj} {Properties:j}{NewLine}{Exception}";
 const string FileOutputTemplate = "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} {Level:u3}] {SourceContext}: {Message:lj} {Properties:j}{NewLine}{Exception}";
 
@@ -65,6 +68,19 @@ try
     });
 
     builder.Services.AddSingleton<IGreetingService, GreetingService>();
+
+    // メッセージ一覧取得 API 用の PostgreSQL 接続。
+    // AppHost の WithReference(messagesDb) / docker-compose / ECS タスク定義が
+    // ConnectionStrings__messagesdb を渡す。接続文字列が無い構成（単体テストなど）でも
+    // 起動できるよう、設定されている場合のみ NpgsqlDataSource を登録し、
+    // 未設定時は MessagesController が 500 (ProblemDetails) を返す。
+    if (!string.IsNullOrEmpty(builder.Configuration.GetConnectionString(MessagesDbConnectionName)))
+    {
+        builder.AddNpgsqlDataSource(MessagesDbConnectionName);
+    }
+
+    builder.Services.AddSingleton<IMessageRepository>(sp =>
+        new MessageRepository(sp.GetService<NpgsqlDataSource>()));
 
     // ローカル(docker-compose+LocalStack)では LocalStack.Aspire.Hosting が転送する "LocalStack" 設定を読み込み、
     // useServiceUrl: true で SQS クライアントのエンドポイントを LocalStack コンテナへ向ける。

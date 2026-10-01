@@ -19,7 +19,11 @@ resource "aws_lb_target_group" "api" {
   target_type = "ip"
 
   health_check {
-    path                = "/health"
+    # 死活確認には "live" タグ付きチェックのみを含む /alive を使う。
+    # /health は RDS 接続チェック（Aspire.Npgsql が自動登録）まで含むため、
+    # DB 一時障害時に全タスクが unhealthy と判定され、DB 不要な
+    # POST /api/messages まで巻き込んで入れ替えが始まってしまう。
+    path                = "/alive"
     protocol            = "HTTP"
     matcher             = "200"
     interval            = 30
